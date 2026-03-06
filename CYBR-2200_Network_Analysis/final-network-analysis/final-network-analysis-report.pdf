@@ -1,0 +1,56 @@
+Final Analysis Report
+
+2022-MTA-workshop-webserver-scanning-1-of-2.pcap
+
+Executive Summary:
+	This packet capture shows sustained inbound probing activity consistent with automated reconnaissance against a single dominant host (188.165.143.159). The traffic is heavily TCP-based with a large ICMP component, and it targets a range of high-value service ports commonly associated with web services and remote administration. This traffic is in line with automated port scanning and not regular user traffic patterns. However, no evidence of successful exploitation was found.
+Network Environment Overview:
+	The network environment appears to be a single focal IPv4 host receiving traffic from many external IP addresses. Most of the traffic in the packet capture has a destination IP address of 188.165.143.159. The patterns found in the packet capture only show small TCP sessions with no long term application layer communication or successful data transfer. 
+Baseline Traffic Analysis:
+	In the capture, TCP is the most used protocol, with very minimal UDP usage seen. The capture also shows 100% IPv4 traffic, with no IPv6 in use at any point. Most sessions held approximately 150-300 bytes per session and had around 2-4 packets per session. Nearly all of these connections seem to be unsuccessful due to no TCP connection displaying successful data exchange.
+Identified Anomalies or Malicious Activity:
+	The primary anomaly from a standard baseline is the presence of multiple sources generating large volumes of SYN-only attempts across many unique destination ports directed at a single host. This behavior is concerning because it indicates deliberate enumeration rather than a normal client-server pattern. The targeted ports include ports that are often brute forced, including 22, 23, 161, 445, 8080, and more. This indicates that this is likely probing for a future attempt at compromising a system.
+Evidence and Indicators:
+	Key indicators in this capture include repeated scanning sources and targeted service ports. A strong scanning indicator is the source 89.248.165.85, which generated 782 SYN attempts across 782 unique destination ports toward a single destination. The ports that were targeted also suggest that this was an automated probing attempt due to the sensitive nature of some of the ports and the repetitiveness of the SYN packet attempts. 
+Analyst Assessment and Recommendations:
+	Due to no successful compromise being observed in the packet capture, this should be treated as suspicious reconnaissance. Additional monitoring for repeated behavior is advised, and closing any non-essential ports should be the next direct step.
+2022-MTA-workshop-webserver-scanning-2-of-2.pcap
+
+Executive Summary:
+	This capture reflects scanning behavior directed at a single dominant host, with TCP overwhelmingly present and repeated attempts to common service ports. Multiple external sources exhibit SYN-heavy patterns consistent with automated port scanning. Ports heavily associated with remote access appear often, suggesting the scanning is focused on identifying remotely exploitable services.
+Network Environment Overview:
+	54.191.67.23 was the target of most of the inbound traffic. The captured packets are mainly composed of IPv4 packets and are mainly composed of external traffic from multiple IP addresses. The data resembles an internet-facing system receiving unsolicited inbound connections over an extended time window.
+Baseline Traffic Analysis: 
+	Most of the traffic consisted of TCP SYN packets with no ACK responses or data transfer. Small volumes of UDP and ICMP are present but minimal. In a normal environment, a public web server might normally see inbound port 80 and 443 traffic, but the baseline expectation for legitimate clients would be fewer ports and more completed handshakes.
+Identified Anomalies or Malicious Activity:
+	The main anomaly is the presence of multiple sources performing SYN-heavy probing across many ports to a single destination. Most of these attempts failed past the SYN stage and TCP handshakes were not finished. These attempted connections targeted notable ports such as 23. 25, 80, 443, and 8080. The overall pattern deviates from normal web user behavior and aligns with reconnaissance and opportunistic exploitation attempts.
+Evidence and Indicators: 
+	The lack of ACK packets for the TCP SYN packets supports the idea that these are failed connection attempts. One source, 185.156.73.12, had approximately 346 SYN attempts across 346 unique ports. The very short sessions with small byte counts only up to 150 bytes confirm there were no successful data transfers. The amount of TCP SYN packets from many external IP addresses sent to 54.191.67.23 only confirm the probing attempt.
+Analyst Assessment and Recommendations: 
+	This packet shows no confirmed compromise, but there was certainly a probing attempt made on host 54.191.67.23. Recommended actions include confirming whether the targeted host is intended to be publicly reachable (if it is not, it should be removed immediately) and restricting access to administrative services. Adding new firewall rules and intrusion detection for multiple TCP SYN attempts in a short timeframe with no response would also be advised. Continuous monitoring of the situation is recommended, as usual. 
+2022-MTA-workshop-exercise-1-of-5.pcap
+Executive Summary:
+	In this packet capture, no malicious activity was found. Host 10.5.31.182 was observed sending multiple outbound encrypted connections through port 443. These connections were made to multiple external IP addresses. However, this traffic is non-suspicious and seems to align with typical web service traffic.
+Network Environment Overview: 
+	The environment includes internal private IPv4 addresses and normal ARP packets. The dominant internal host is 10.5.31.182, and 10.5.31.5 appears as a major internal peer. The traffic includes both internal communications and outbound internet traffic (notably HTTPS), and resembles a typical Windows environment. No findings related to unwanted outbound traffic was found. 
+Baseline Traffic Analysis: 
+	Baseline behavior in this capture includes standard enterprise Windows traffic, including ports 88, 389, and 445. The irregularity of connections and connection lengths are indicative of normal user traffic, as well as normal TCP three-way-handshakes. 
+Identified Anomalies or Malicious Activity: 
+	No malicious activity was detected in the packet capture. The most relevant potential anomaly is that external communications are concentrated among a small set of public IPs relative to the total volume of traffic, which could be normal web service traffic. Because of the encrypted traffic, it is impossible to be 100% certain without user consultation.
+Evidence and Indicators: 
+	Key observable indicators include the dominant internal host 10.5.31.182 and the prominent internal peer 10.5.31.5. The port usage also indicates that the traffic is normal, as no suspicious ports are used. Again, the only activity that could be considered suspicious is the amount of encrypted traffic, but this is still easily explainable.
+Analyst Assessment and Recommendations: 
+	The capture is mostly normal traffic with only a user consultation required. Validating that the user’s traffic is normal is very important. As usual, continuous network monitoring is recommended. Outside of this, everything seems typical. 
+2022-MTA-workshop-exercise-2-of-5.pcap
+Executive Summary:
+	No evidence of malicious activity was detected in this packet capture. The capture shows a dominant internal host generating primarily TCP traffic with a strong emphasis on HTTPS traffic. While HTTPS is common in networks, the limited diversity of destinations combined with sustained encrypted sessions is a pattern frequently associated with suspicious or potentially malicious activity, depending on context. Due to the encrypted nature of the traffic, the nature of the traffic cannot be confirmed.
+Network Environment Overview: 
+	IP address 10.5.31.139 is acting as the client and sending outbound connections to a multitude of public IP addresses. UDP exists but is limited, with DNS and local discovery ports present at low levels. The traffic profile is largely external, with few indicators of internal directory service usage.
+Baseline Traffic Analysis: 
+	The low UDP usage is slightly concerning, and more internal direct traffic would be expected of baseline traffic. A typical baseline for a user endpoint often includes broader destination diversity than what is observed, although the exact expectation depends on whether the endpoint is running a single application or communicating with a specific service.
+Identified Anomalies or Malicious Activity: 
+	The external IP 64.44.101.193 appears extremely frequently relative to other peers and is involved in a large portion of the capture’s communication. This is concerning because command-and-control systems often rely on repeated contact with a limited set of servers, and HTTPS can conceal the payload and intent. This does not conclusively confirm malware, but it meets the threshold for suspicious activity requiring validation.
+Evidence and Indicators: 
+	The combination of repeated encrypted sessions and limited destination diversity is the principal indicator of concern, as well as the length of the HTTPS connections. 
+Analyst Assessment and Recommendations: 
+	This packet capture should be considered suspicious activity, but the only direct action needed is a follow-up with the user to confirm the activity is normal. If not, then recommended actions are to analyze more packet captures for more suspicious behavior and analyze timing and session persistence to identify beacon-like behavior.
