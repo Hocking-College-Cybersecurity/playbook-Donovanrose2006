@@ -1,0 +1,3 @@
+id,name,age,conditions,discharged
+1,John Doe,35,"Broken arm, Concussion.",False
+2,Jane Doe,32,Fever,False
